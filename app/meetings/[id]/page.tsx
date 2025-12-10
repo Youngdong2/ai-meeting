@@ -24,13 +24,10 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
   const totalActions = meeting.actionItems.length;
 
   return (
-    <div className="py-6 space-y-6">
+    <div className="py-8 space-y-12">
       {/* Header */}
-      <div className="space-y-2">
-        <Link
-          href="/meetings"
-          className="inline-flex items-center gap-1 text-blue-500 text-sm font-medium hover:text-blue-600"
-        >
+      <div className="space-y-4">
+        <Link href="/meetings" className="link-apple inline-flex items-center gap-1 text-body">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -43,24 +40,24 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
           </svg>
           회의록 목록
         </Link>
-        <h1 className="text-2xl font-bold">{meeting.title}</h1>
-        <div className="flex items-center gap-3 text-sm text-gray-500">
+        <h1 className="text-headline-2">{meeting.title}</h1>
+        <div className="flex items-center gap-2 text-body text-[var(--text-secondary)]">
           <span>{meeting.date}</span>
-          <span>•</span>
+          <span>·</span>
           <span>{meeting.duration}</span>
-          <span>•</span>
+          <span>·</span>
           <span>{meeting.participants.length}명 참석</span>
         </div>
       </div>
 
       {/* Participants */}
-      <section className="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl">
-        <h2 className="text-sm font-medium text-gray-500 mb-3">참석자</h2>
+      <section className="space-y-4">
+        <h2 className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">참석자</h2>
         <div className="flex flex-wrap gap-2">
           {meeting.participants.map((participant, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-white dark:bg-gray-800 rounded-full text-sm"
+              className="px-3 py-1.5 border border-[var(--border-light)] rounded-full text-body-tight"
             >
               {participant}
             </span>
@@ -69,78 +66,73 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
       </section>
 
       {/* Summary */}
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">요약</h2>
-        <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{meeting.summary}</p>
+      <section className="space-y-4">
+        <h2 className="text-headline-3">요약</h2>
+        <p className="text-intro text-[var(--text-secondary)] leading-relaxed">{meeting.summary}</p>
       </section>
 
       {/* Key Points */}
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">핵심 포인트</h2>
-        <ul className="space-y-2">
+      <section className="space-y-6">
+        <h2 className="text-headline-3">핵심 포인트</h2>
+        <ul className="space-y-4">
           {meeting.keyPoints.map((point, index) => (
-            <li key={index} className="flex items-start gap-3">
-              <span className="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-xs font-medium">
+            <li key={index} className="flex items-start gap-4">
+              <span className="flex-shrink-0 w-7 h-7 bg-[var(--link)] text-white rounded-full flex items-center justify-center text-caption font-semibold">
                 {index + 1}
               </span>
-              <span className="text-gray-600 dark:text-gray-300">{point}</span>
+              <span className="text-body text-[var(--text-primary)] pt-0.5">{point}</span>
             </li>
           ))}
         </ul>
       </section>
 
       {/* Action Items */}
-      <section className="space-y-3">
+      <section className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">할일 목록</h2>
-          <span className="text-sm text-gray-500">
+          <h2 className="text-headline-3">할일 목록</h2>
+          <span className="text-body text-[var(--text-secondary)]">
             {completedActions}/{totalActions} 완료
           </span>
         </div>
-        <div className="space-y-2">
+        <div className="divide-y divide-[var(--border-light)]">
           {meeting.actionItems.map((item) => (
-            <div
-              key={item.id}
-              className={`p-4 rounded-xl border ${
-                item.completed
-                  ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-800'
-                  : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div
-                  className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+            <div key={item.id} className="py-4 flex items-start gap-4">
+              <div
+                className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center mt-0.5 ${
+                  item.completed
+                    ? 'bg-[#34c759] border-[#34c759]'
+                    : 'border-[var(--border)] bg-transparent'
+                }`}
+              >
+                {item.completed && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={3}
+                    stroke="white"
+                    className="w-3 h-3"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                  </svg>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p
+                  className={`text-body ${
                     item.completed
-                      ? 'bg-green-500 border-green-500'
-                      : 'border-gray-300 dark:border-gray-600'
+                      ? 'text-[var(--text-tertiary)] line-through'
+                      : 'text-[var(--text-primary)]'
                   }`}
                 >
-                  {item.completed && (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={3}
-                      stroke="white"
-                      className="w-3 h-3"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                    </svg>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p
-                    className={`font-medium ${
-                      item.completed ? 'text-gray-400 line-through' : 'text-gray-800 dark:text-gray-200'
-                    }`}
-                  >
-                    {item.task}
-                  </p>
-                  <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
-                    <span>{item.assignee}</span>
-                    <span>•</span>
-                    <span>마감: {item.dueDate}</span>
-                  </div>
+                  {item.task}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-caption text-[var(--text-tertiary)]">{item.assignee}</span>
+                  <span className="text-caption text-[var(--text-tertiary)]">·</span>
+                  <span className="text-caption text-[var(--text-tertiary)]">
+                    마감: {item.dueDate}
+                  </span>
                 </div>
               </div>
             </div>
@@ -149,11 +141,11 @@ export default async function MeetingDetailPage({ params }: MeetingDetailPagePro
       </section>
 
       {/* Actions */}
-      <div className="flex gap-3 pt-4">
-        <button className="flex-1 py-3 bg-gray-100 dark:bg-gray-800 rounded-xl font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+      <div className="flex gap-4 pt-4">
+        <button className="flex-1 py-3 text-[var(--link)] text-body font-medium border border-[var(--border-light)] rounded-full hover:bg-[var(--background-secondary)] transition-colors">
           공유하기
         </button>
-        <button className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors">
+        <button className="flex-1 py-3 bg-[var(--link)] text-white text-body font-medium rounded-full hover:opacity-90 transition-opacity">
           수정하기
         </button>
       </div>

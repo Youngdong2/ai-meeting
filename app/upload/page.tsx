@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 
 export default function UploadPage() {
   const [dragActive, setDragActive] = useState(false);
@@ -34,20 +33,23 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="py-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">새 회의록 업로드</h1>
-        <p className="text-gray-500 dark:text-gray-400">
-          음성 파일이나 텍스트 파일을 업로드하면 AI가 자동으로 요약해드립니다
+    <div className="py-8 space-y-10">
+      {/* Header */}
+      <div className="space-y-4">
+        <h1 className="text-headline">새 회의록</h1>
+        <p className="text-intro text-[var(--text-secondary)]">
+          음성 파일이나 텍스트를 업로드하면
+          <br />
+          AI가 자동으로 요약해드립니다
         </p>
       </div>
 
       {/* Upload Area */}
       <div
-        className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-colors ${
+        className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all ${
           dragActive
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/10'
-            : 'border-gray-300 dark:border-gray-700'
+            ? 'border-[var(--link)] bg-[rgba(0,102,204,0.05)]'
+            : 'border-[var(--border)]'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -61,15 +63,15 @@ export default function UploadPage() {
           accept=".mp3,.wav,.m4a,.txt,.doc,.docx,.pdf"
           onChange={handleFileChange}
         />
-        <div className="space-y-4">
-          <div className="w-16 h-16 mx-auto bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
+        <div className="space-y-6">
+          <div className="w-16 h-16 mx-auto flex items-center justify-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
-              strokeWidth={1.5}
+              strokeWidth={1}
               stroke="currentColor"
-              className="w-8 h-8 text-gray-400"
+              className="w-16 h-16 text-[var(--text-tertiary)]"
             >
               <path
                 strokeLinecap="round"
@@ -79,41 +81,41 @@ export default function UploadPage() {
             </svg>
           </div>
           <div>
-            <p className="font-medium">파일을 드래그하거나 클릭하여 업로드</p>
-            <p className="text-sm text-gray-500 mt-1">MP3, WAV, M4A, TXT, DOC, PDF (최대 100MB)</p>
+            <p className="text-eyebrow text-[var(--text-primary)]">
+              파일을 드래그하거나 클릭하여 업로드
+            </p>
+            <p className="text-body text-[var(--text-tertiary)] mt-2">
+              MP3, WAV, M4A, TXT, DOC, PDF (최대 100MB)
+            </p>
           </div>
         </div>
       </div>
 
       {/* Uploaded File */}
       {uploadedFile && (
-        <div className="p-4 bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+        <div className="p-5 border border-[#34c759] rounded-2xl bg-[rgba(52,199,89,0.05)]">
+          <div className="flex items-center gap-4">
+            <div className="w-11 h-11 bg-[#34c759] rounded-full flex items-center justify-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-5 h-5 text-green-600"
+                strokeWidth={2}
+                stroke="white"
+                className="w-5 h-5"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-medium truncate">{uploadedFile.name}</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-body font-medium truncate">{uploadedFile.name}</p>
+              <p className="text-caption text-[var(--text-tertiary)]">
                 {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
               </p>
             </div>
             <button
               onClick={() => setUploadedFile(null)}
-              className="p-2 hover:bg-green-100 dark:hover:bg-green-900/30 rounded-lg transition-colors"
+              className="p-2 hover:bg-[var(--background-secondary)] rounded-full transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -121,7 +123,7 @@ export default function UploadPage() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="w-5 h-5 text-gray-500"
+                className="w-5 h-5 text-[var(--text-tertiary)]"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
               </svg>
@@ -131,50 +133,58 @@ export default function UploadPage() {
       )}
 
       {/* Or divider */}
-      <div className="relative">
+      <div className="relative py-4">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
+          <div className="w-full border-t border-[var(--border-light)]"></div>
         </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-4 bg-white dark:bg-gray-950 text-gray-500">또는</span>
+        <div className="relative flex justify-center">
+          <span className="px-4 bg-[var(--background)] text-caption text-[var(--text-tertiary)]">
+            또는
+          </span>
         </div>
       </div>
 
       {/* Text Input */}
-      <div className="space-y-3">
-        <label className="block text-sm font-medium">회의 내용 직접 입력</label>
+      <div className="space-y-4">
+        <label className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">
+          회의 내용 직접 입력
+        </label>
         <textarea
           placeholder="회의 내용을 입력하세요..."
-          className="w-full h-40 p-4 bg-gray-50 dark:bg-gray-900 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          className="w-full h-40 p-4 bg-[var(--background)] border border-[var(--border-light)] rounded-xl text-body placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--link)] resize-none"
         />
       </div>
 
       {/* Meeting Info */}
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">회의 제목</label>
+      <div className="space-y-6">
+        <div className="space-y-3">
+          <label className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">
+            회의 제목
+          </label>
           <input
             type="text"
             placeholder="예: 2024 Q4 제품 로드맵 회의"
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border-light)] rounded-xl text-body placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--link)]"
           />
         </div>
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">참석자</label>
+        <div className="space-y-3">
+          <label className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">
+            참석자
+          </label>
           <input
             type="text"
             placeholder="예: 김영동, 이수진, 박민호"
-            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 bg-[var(--background)] border border-[var(--border-light)] rounded-xl text-body placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--link)]"
           />
         </div>
       </div>
 
       {/* Submit Button */}
-      <button className="w-full py-4 bg-blue-500 text-white font-medium rounded-xl hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+      <button className="w-full py-4 bg-[var(--link)] text-white text-body font-medium rounded-full hover:opacity-90 transition-opacity">
         AI 요약 시작하기
       </button>
 
-      <p className="text-center text-xs text-gray-400">
+      <p className="text-center text-caption text-[var(--text-tertiary)]">
         업로드된 파일은 요약 후 안전하게 삭제됩니다
       </p>
     </div>

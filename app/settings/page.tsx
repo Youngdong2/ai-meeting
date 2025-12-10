@@ -8,49 +8,49 @@ export default function SettingsPage() {
   const [autoSummary, setAutoSummary] = useState(true);
 
   return (
-    <div className="py-6 space-y-6">
-      <h1 className="text-2xl font-bold">설정</h1>
+    <div className="py-8 space-y-10">
+      <h1 className="text-headline">설정</h1>
 
       {/* Account Section */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">계정</h2>
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl overflow-hidden">
-          <div className="p-4 flex items-center gap-4">
-            <div className="w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-xl font-bold text-white">김</span>
-            </div>
-            <div className="flex-1">
-              <p className="font-medium">김영동</p>
-              <p className="text-sm text-gray-500">youngdong@email.com</p>
-            </div>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-5 h-5 text-gray-400"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
+      <section className="space-y-4">
+        <h2 className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">계정</h2>
+        <button className="w-full p-5 flex items-center gap-4 border border-[var(--border-light)] rounded-2xl hover:bg-[var(--background-secondary)] transition-colors">
+          <div className="w-14 h-14 bg-[var(--link)] rounded-full flex items-center justify-center">
+            <span className="text-xl font-semibold text-white">김</span>
           </div>
-        </div>
+          <div className="flex-1 text-left">
+            <p className="text-body font-medium">김영동</p>
+            <p className="text-caption text-[var(--text-secondary)]">youngdong@email.com</p>
+          </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5 text-[var(--text-tertiary)]"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
       </section>
 
       {/* Preferences Section */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">환경설정</h2>
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl overflow-hidden divide-y divide-gray-200 dark:divide-gray-800">
+      <section className="space-y-4">
+        <h2 className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">
+          환경설정
+        </h2>
+        <div className="divide-y divide-[var(--border-light)] border border-[var(--border-light)] rounded-2xl overflow-hidden">
           {/* Dark Mode */}
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+          <div className="p-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-[#5e5ce6] rounded-lg flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
-                  stroke="currentColor"
+                  stroke="white"
                   className="w-5 h-5"
                 >
                   <path
@@ -60,16 +60,16 @@ export default function SettingsPage() {
                   />
                 </svg>
               </div>
-              <span className="font-medium">다크 모드</span>
+              <span className="text-body">다크 모드</span>
             </div>
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className={`relative w-12 h-7 rounded-full transition-colors ${
-                darkMode ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              className={`relative w-[51px] h-[31px] rounded-full transition-colors ${
+                darkMode ? 'bg-[#34c759]' : 'bg-[var(--border)]'
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                className={`absolute top-[2px] left-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-sm transition-transform ${
                   darkMode ? 'translate-x-5' : ''
                 }`}
               />
@@ -77,16 +77,16 @@ export default function SettingsPage() {
           </div>
 
           {/* Notifications */}
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+          <div className="p-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-[#ff3b30] rounded-lg flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5 text-red-500"
+                  stroke="white"
+                  className="w-5 h-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -95,16 +95,16 @@ export default function SettingsPage() {
                   />
                 </svg>
               </div>
-              <span className="font-medium">알림</span>
+              <span className="text-body">알림</span>
             </div>
             <button
               onClick={() => setNotifications(!notifications)}
-              className={`relative w-12 h-7 rounded-full transition-colors ${
-                notifications ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              className={`relative w-[51px] h-[31px] rounded-full transition-colors ${
+                notifications ? 'bg-[#34c759]' : 'bg-[var(--border)]'
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                className={`absolute top-[2px] left-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-sm transition-transform ${
                   notifications ? 'translate-x-5' : ''
                 }`}
               />
@@ -112,16 +112,16 @@ export default function SettingsPage() {
           </div>
 
           {/* Auto Summary */}
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+          <div className="p-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-[#34c759] rounded-lg flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-5 h-5 text-green-500"
+                  stroke="white"
+                  className="w-5 h-5"
                 >
                   <path
                     strokeLinecap="round"
@@ -131,18 +131,20 @@ export default function SettingsPage() {
                 </svg>
               </div>
               <div>
-                <span className="font-medium">자동 요약</span>
-                <p className="text-xs text-gray-500">업로드 시 자동으로 AI 요약 실행</p>
+                <span className="text-body">자동 요약</span>
+                <p className="text-caption text-[var(--text-tertiary)]">
+                  업로드 시 자동으로 AI 요약 실행
+                </p>
               </div>
             </div>
             <button
               onClick={() => setAutoSummary(!autoSummary)}
-              className={`relative w-12 h-7 rounded-full transition-colors ${
-                autoSummary ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-600'
+              className={`relative w-[51px] h-[31px] rounded-full transition-colors ${
+                autoSummary ? 'bg-[#34c759]' : 'bg-[var(--border)]'
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                className={`absolute top-[2px] left-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-sm transition-transform ${
                   autoSummary ? 'translate-x-5' : ''
                 }`}
               />
@@ -152,44 +154,44 @@ export default function SettingsPage() {
       </section>
 
       {/* About Section */}
-      <section className="space-y-3">
-        <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">정보</h2>
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-xl overflow-hidden divide-y divide-gray-200 dark:divide-gray-800">
-          <button className="w-full p-4 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <span className="font-medium">이용약관</span>
+      <section className="space-y-4">
+        <h2 className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">정보</h2>
+        <div className="divide-y divide-[var(--border-light)] border border-[var(--border-light)] rounded-2xl overflow-hidden">
+          <button className="w-full p-5 flex items-center justify-between hover:bg-[var(--background-secondary)] transition-colors">
+            <span className="text-body">이용약관</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-5 h-5 text-gray-400"
+              className="w-5 h-5 text-[var(--text-tertiary)]"
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
           </button>
-          <button className="w-full p-4 flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <span className="font-medium">개인정보처리방침</span>
+          <button className="w-full p-5 flex items-center justify-between hover:bg-[var(--background-secondary)] transition-colors">
+            <span className="text-body">개인정보처리방침</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="w-5 h-5 text-gray-400"
+              className="w-5 h-5 text-[var(--text-tertiary)]"
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
             </svg>
           </button>
-          <div className="p-4 flex items-center justify-between">
-            <span className="font-medium">버전</span>
-            <span className="text-gray-500">1.0.0</span>
+          <div className="p-5 flex items-center justify-between">
+            <span className="text-body">버전</span>
+            <span className="text-body text-[var(--text-tertiary)]">1.0.0</span>
           </div>
         </div>
       </section>
 
       {/* Logout Button */}
-      <button className="w-full py-4 bg-red-50 dark:bg-red-900/10 text-red-500 font-medium rounded-xl hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors">
+      <button className="w-full py-4 text-[#ff3b30] text-body font-medium border border-[var(--border-light)] rounded-full hover:bg-[var(--background-secondary)] transition-colors">
         로그아웃
       </button>
     </div>
