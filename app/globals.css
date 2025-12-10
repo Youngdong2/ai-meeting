@@ -1,8 +1,35 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
+  /* Apple-inspired color palette - Light */
   --background: #ffffff;
-  --foreground: #171717;
+  --background-secondary: #fbfbfd;
+  --foreground: #1d1d1f;
+  --text-primary: #1d1d1f;
+  --text-secondary: #86868b;
+  --text-tertiary: #6e6e73;
+  --border: #d2d2d7;
+  --border-light: #f5f5f7;
+  --link: #06c;
+  --link-hover: #0077ed;
+  --surface: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Apple-inspired color palette - Dark */
+    --background: #000000;
+    --background-secondary: #1d1d1f;
+    --foreground: #f5f5f7;
+    --text-primary: #f5f5f7;
+    --text-secondary: #a1a1a6;
+    --text-tertiary: #86868b;
+    --border: #424245;
+    --border-light: #2d2d2d;
+    --link: #2997ff;
+    --link-hover: #52a8ff;
+    --surface: #000000;
+  }
 }
 
 @theme inline {
@@ -12,15 +39,168 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue',
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 17px;
+  line-height: 1.47059;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+}
+
+/* Apple Typography */
+.text-headline {
+  font-size: 48px;
+  line-height: 1.08349;
+  font-weight: 600;
+  letter-spacing: -0.003em;
+}
+
+.text-headline-2 {
+  font-size: 40px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.text-headline-3 {
+  font-size: 28px;
+  line-height: 1.14286;
+  font-weight: 600;
+  letter-spacing: 0.007em;
+}
+
+.text-eyebrow {
+  font-size: 21px;
+  line-height: 1.19048;
+  font-weight: 600;
+  letter-spacing: 0.011em;
+}
+
+.text-intro {
+  font-size: 21px;
+  line-height: 1.381;
+  font-weight: 400;
+  letter-spacing: 0.011em;
+}
+
+.text-body {
+  font-size: 17px;
+  line-height: 1.47059;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+}
+
+.text-body-tight {
+  font-size: 17px;
+  line-height: 1.23536;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+}
+
+.text-caption {
+  font-size: 12px;
+  line-height: 1.33337;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Apple Link Style */
+.link-apple {
+  color: var(--link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.link-apple:hover {
+  text-decoration: underline;
+  color: var(--link-hover);
+}
+
+/* Apple Button Style */
+.btn-apple {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border-radius: 980px;
+  font-size: 17px;
+  line-height: 1.17648;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  min-width: 28px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.btn-apple-primary {
+  background: var(--link);
+  color: #ffffff;
+}
+
+.btn-apple-primary:hover {
+  background: var(--link-hover);
+}
+
+.btn-apple-secondary {
+  background: transparent;
+  color: var(--link);
+  border: none;
+}
+
+.btn-apple-secondary:hover {
+  text-decoration: underline;
+}
+
+/* Safe area for bottom navigation (iOS) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Apple-style scrollbar - Hidden by default, show on hover */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 4px;
+}
+
+body:hover::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+}
+
+/* Apple-style focus ring */
+:focus-visible {
+  outline: 4px solid rgba(0, 125, 250, 0.6);
+  outline-offset: 1px;
+}
+
+/* Smooth transitions - Apple style */
+a,
+button {
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* Section divider */
+.section-divider {
+  border-top: 1px solid var(--border-light);
 }

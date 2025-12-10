@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+# Run lint-staged for incremental checks
+npx lint-staged
+
+# Run full type check
+npm run type-check
+
+# Run build to ensure no build errors
+npm run build
