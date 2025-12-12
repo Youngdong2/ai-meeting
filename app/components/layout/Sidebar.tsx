@@ -14,7 +14,7 @@ const navItems = [
         viewBox="0 0 24 24"
         strokeWidth={active ? 0 : 1.5}
         stroke="currentColor"
-        className="w-[22px] h-[22px]"
+        className="w-5 h-5"
       >
         <path
           strokeLinecap="round"
@@ -34,7 +34,7 @@ const navItems = [
         viewBox="0 0 24 24"
         strokeWidth={active ? 0 : 1.5}
         stroke="currentColor"
-        className="w-[22px] h-[22px]"
+        className="w-5 h-5"
       >
         <path
           strokeLinecap="round"
@@ -46,15 +46,15 @@ const navItems = [
   },
   {
     href: '/upload',
-    label: '업로드',
-    icon: () => (
+    label: '새 회의록',
+    icon: (active: boolean) => (
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
-        strokeWidth={2}
+        strokeWidth={active ? 2 : 1.5}
         stroke="currentColor"
-        className="w-[22px] h-[22px]"
+        className="w-5 h-5"
       >
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
@@ -70,7 +70,7 @@ const navItems = [
         viewBox="0 0 24 24"
         strokeWidth={active ? 0 : 1.5}
         stroke="currentColor"
-        className="w-[22px] h-[22px]"
+        className="w-5 h-5"
       >
         <path
           strokeLinecap="round"
@@ -87,30 +87,35 @@ const navItems = [
   },
 ];
 
-export default function BottomNavigation() {
+export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-[rgba(251,251,253,0.8)] backdrop-blur-xl backdrop-saturate-[180%] dark:bg-[rgba(29,29,31,0.8)] pb-safe">
-      <div className="max-w-[734px] mx-auto px-6 h-[50px] flex items-center justify-around">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex flex-col items-center justify-center gap-0.5 min-w-[64px] py-1 transition-all ${
-                isActive
-                  ? 'text-[var(--link)]'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-              }`}
-            >
-              {item.icon(isActive)}
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+    <aside className="fixed left-0 top-14 bottom-0 w-60 bg-[var(--background-secondary)] border-r border-[var(--border-light)]">
+      <nav className="p-4">
+        <ul className="space-y-1">
+          {navItems.map((item) => {
+            const isActive =
+              item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                    isActive
+                      ? 'bg-[var(--link)] text-white'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--border-light)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {item.icon(isActive)}
+                  <span className="text-[15px] font-medium">{item.label}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </aside>
   );
 }
