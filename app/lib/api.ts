@@ -103,8 +103,9 @@ async function fetchApi<T>(
 
     const result: ApiResponse<T> = await response.json();
 
-    // Handle token expiration
-    if (!result.success && result.error?.code === ERROR_CODES.TOKEN_EXPIRED) {
+    // Handle token expiration or invalid token (40100, 40103, 40104)
+    const tokenErrorCodes: string[] = [ERROR_CODES.AUTH_REQUIRED, ERROR_CODES.INVALID_TOKEN, ERROR_CODES.TOKEN_EXPIRED];
+    if (!result.success && result.error?.code && tokenErrorCodes.includes(result.error.code)) {
       const refreshed = await refreshAccessToken();
       if (refreshed) {
         // Retry the request with new token
@@ -288,7 +289,7 @@ export const teamApi = {
     request: TeamSettingUpdateRequest
   ): Promise<ApiResponse<TeamSetting>> => {
     return fetchApi<TeamSetting>(
-      `/teams/${teamId}/settings`,
+      `/teams/${teamId}/settings/update`,
       {
         method: 'PATCH',
         body: JSON.stringify(request),

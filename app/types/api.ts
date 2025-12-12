@@ -40,12 +40,16 @@ export interface Team {
 
 export interface TeamSetting {
   id: number;
-  openai_api_key_set: boolean;
+  // 마스킹된 API 키 문자열 (설정됨 여부 확인용)
+  openai_api_key: string;
   confluence_site_url: string | null;
+  confluence_api_token: string;
+  confluence_user_email: string | null;
   confluence_space_key: string | null;
-  confluence_configured: boolean;
-  slack_webhook_configured: boolean;
-  slack_bot_configured: boolean;
+  confluence_parent_page_id: string | null;
+  // 추가 상태 플래그
+  slack_webhook_configured?: boolean;
+  slack_bot_configured?: boolean;
   slack_default_channel: string | null;
   created_at: string;
   updated_at: string;

@@ -3,6 +3,7 @@
 import { useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 import { useMeeting } from '@/app/contexts/MeetingContext';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { MeetingStatusBadge, ProcessingStatus } from '@/app/components/meeting';
@@ -19,7 +20,7 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
 
   const handleProcessingComplete = useCallback(() => {
-    // Refresh meeting data when processing completes
+    // Refresh meeting data when processing completes (silent refresh)
     fetchMeeting(parseInt(id, 10));
   }, [fetchMeeting, id]);
 
@@ -53,7 +54,10 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
     return `${mins}분 ${secs}초`;
   };
 
-  if (authLoading || isLoading) {
+  // 최초 로딩 시에만 스켈레톤 표시 (이미 데이터가 있으면 스켈레톤 표시 안함)
+  const showSkeleton = (authLoading || isLoading) && !currentMeeting;
+
+  if (showSkeleton) {
     return (
       <div className="py-8 space-y-12">
         <div className="space-y-4">
@@ -183,9 +187,34 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
       {currentMeeting.summary && (
         <section className="space-y-4">
           <h2 className="text-headline-3">요약</h2>
-          <p className="text-intro text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
-            {currentMeeting.summary}
-          </p>
+          <div className="prose prose-gray max-w-none text-[var(--text-secondary)]">
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => <h1 className="text-2xl font-bold mt-6 mb-3 text-[var(--text-primary)]">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-xl font-semibold mt-5 mb-2 text-[var(--text-primary)]">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-lg font-medium mt-4 mb-2 text-[var(--text-primary)]">{children}</h3>,
+                p: ({ children }) => <p className="text-body leading-relaxed mb-3">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc list-inside space-y-1 mb-3">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 mb-3">{children}</ol>,
+                li: ({ children }) => <li className="text-body">{children}</li>,
+                strong: ({ children }) => <strong className="font-semibold text-[var(--text-primary)]">{children}</strong>,
+                em: ({ children }) => <em className="italic">{children}</em>,
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-[var(--border)] pl-4 italic text-[var(--text-tertiary)] my-3">
+                    {children}
+                  </blockquote>
+                ),
+                code: ({ children }) => (
+                  <code className="bg-[var(--background-secondary)] px-1.5 py-0.5 rounded text-sm font-mono">
+                    {children}
+                  </code>
+                ),
+                hr: () => <hr className="my-6 border-[var(--border-light)]" />,
+              }}
+            >
+              {currentMeeting.summary}
+            </ReactMarkdown>
+          </div>
         </section>
       )}
 

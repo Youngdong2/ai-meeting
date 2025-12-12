@@ -9,15 +9,16 @@ import { MeetingStatusBadge } from '@/app/components/meeting';
 
 export default function MeetingsPage() {
   const { meetings, isLoading, error, fetchMeetings } = useMeeting();
-  const { currentTeam } = useTeam();
+  const { currentTeam, isLoading: teamLoading } = useTeam();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    if (isAuthenticated && currentTeam) {
+    // 인증 완료 후 회의록 불러오기 (팀 유무와 관계없이)
+    if (isAuthenticated && !teamLoading) {
       fetchMeetings();
     }
-  }, [isAuthenticated, currentTeam, fetchMeetings]);
+  }, [isAuthenticated, teamLoading, fetchMeetings]);
 
   // 검색 필터링
   const filteredMeetings = meetings.filter(
@@ -148,7 +149,7 @@ export default function MeetingsPage() {
             {searchQuery ? '검색 결과가 없습니다' : '아직 회의록이 없습니다'}
           </p>
           {!searchQuery && (
-            <Link href="/upload" className="link-apple">
+            <Link href="/record" className="link-apple">
               첫 회의록 만들기 →
             </Link>
           )}
