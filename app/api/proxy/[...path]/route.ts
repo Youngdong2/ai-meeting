@@ -14,10 +14,21 @@ const NO_TRAILING_SLASH_PATHS = [
   'users/profile/change-password',
 ];
 
+// Path patterns that should NOT have trailing slash (regex)
+const NO_TRAILING_SLASH_PATTERNS = [
+  /^teams\/\d+\/settings$/,      // teams/{id}/settings
+  /^teams\/\d+\/members$/,       // teams/{id}/members
+  /^teams\/\d+\/members\/\d+\/admin$/, // teams/{id}/members/{user_id}/admin
+];
+
 function buildApiPath(path: string[]): string {
   const joinedPath = path.join('/');
-  // Check if path matches any no-trailing-slash pattern
+  // Check if path matches any no-trailing-slash exact path
   if (NO_TRAILING_SLASH_PATHS.some((p) => joinedPath === p || joinedPath.startsWith(p + '/'))) {
+    return joinedPath;
+  }
+  // Check if path matches any no-trailing-slash pattern (regex)
+  if (NO_TRAILING_SLASH_PATTERNS.some((pattern) => pattern.test(joinedPath))) {
     return joinedPath;
   }
   // Add trailing slash for Django backend compatibility
