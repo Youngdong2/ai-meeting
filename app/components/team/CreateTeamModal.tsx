@@ -22,7 +22,7 @@ export default function CreateTeamModal({ isOpen, onClose }: CreateTeamModalProp
       // Django validation error format: {field: [errors...]}
       const errorObj = err as Record<string, unknown>;
       const messages: string[] = [];
-      for (const [key, value] of Object.entries(errorObj)) {
+      for (const [, value] of Object.entries(errorObj)) {
         if (Array.isArray(value)) {
           messages.push(...value.map(String));
         } else if (typeof value === 'string') {

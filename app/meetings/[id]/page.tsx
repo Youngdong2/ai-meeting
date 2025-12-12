@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, use } from 'react';
+import { useEffect, use, useCallback } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { useMeeting } from '@/app/contexts/MeetingContext';
 import { useAuth } from '@/app/contexts/AuthContext';
-import { MeetingStatusBadge } from '@/app/components/meeting';
+import { MeetingStatusBadge, ProcessingStatus } from '@/app/components/meeting';
 
 interface MeetingDetailPageProps {
   params: Promise<{ id: string }>;
@@ -12,8 +13,15 @@ interface MeetingDetailPageProps {
 
 export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
+  const isProcessing = searchParams.get('processing') === 'true';
   const { currentMeeting, isLoading, error, fetchMeeting, clearCurrentMeeting } = useMeeting();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  const handleProcessingComplete = useCallback(() => {
+    // Refresh meeting data when processing completes
+    fetchMeeting(parseInt(id, 10));
+  }, [fetchMeeting, id]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -155,26 +163,16 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
       </div>
 
       {/* Processing Status (if not completed) */}
-      {currentMeeting.status !== 'completed' && currentMeeting.status !== 'failed' && (
-        <section className="p-6 bg-blue-50 border border-blue-200 rounded-xl">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <div>
-              <p className="text-[15px] font-medium text-blue-800">처리 중입니다</p>
-              <p className="text-[13px] text-blue-600">
-                {currentMeeting.status === 'transcribing' && '음성을 텍스트로 변환하고 있습니다...'}
-                {currentMeeting.status === 'correcting' && '텍스트를 교정하고 있습니다...'}
-                {currentMeeting.status === 'summarizing' && '내용을 요약하고 있습니다...'}
-                {currentMeeting.status === 'compressing' && '파일을 압축하고 있습니다...'}
-                {currentMeeting.status === 'pending' && '처리 대기 중입니다...'}
-              </p>
-            </div>
-          </div>
-        </section>
+      {(isProcessing || (currentMeeting.status !== 'completed' && currentMeeting.status !== 'failed')) && (
+        <ProcessingStatus
+          meetingId={currentMeeting.id}
+          initialStatus={currentMeeting.status}
+          onComplete={handleProcessingComplete}
+        />
       )}
 
-      {/* Failed Status */}
-      {currentMeeting.status === 'failed' && (
+      {/* Failed Status (only if not using ProcessingStatus) */}
+      {!isProcessing && currentMeeting.status === 'failed' && (
         <section className="p-6 bg-red-50 border border-red-200 rounded-xl">
           <p className="text-[15px] font-medium text-red-800">처리에 실패했습니다</p>
           <p className="text-[13px] text-red-600 mt-1">다시 시도하거나 관리자에게 문의하세요</p>
