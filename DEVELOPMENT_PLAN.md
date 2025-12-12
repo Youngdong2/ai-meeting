@@ -74,16 +74,23 @@ Django 백엔드 API와 연동하는 Next.js 16 프론트엔드 개발
   - 3초 간격 폴링
   - 상태별 프로그레스 바 표시 (pending → compressing → transcribing → correcting → summarizing → completed)
 
-### Phase 4: 설정 페이지
+### Phase 4: 설정 페이지 ✅ 완료
 
-- [ ] 팀 설정 페이지 (`app/(main)/settings/team/page.tsx`)
-  - [ ] OpenAI API Key 설정
-  - [ ] Confluence 연동 설정
-  - [ ] Slack 연동 설정
-- [ ] 프로필 설정 페이지 (`app/(main)/settings/profile/page.tsx`)
-  - [ ] 프로필 수정
-  - [ ] 비밀번호 변경
-- [ ] 팀 멤버 관리 (관리자 전용)
+- [x] 설정 페이지 탭 레이아웃 (`app/settings/page.tsx`)
+  - 프로필 / 팀 설정 / 멤버 관리 탭
+  - 팀 관리자만 팀 설정/멤버 관리 탭 표시
+- [x] 프로필 설정 (`app/settings/ProfileSettings.tsx`)
+  - [x] 계정 정보 조회
+  - [x] 전화번호 수정
+  - [x] 비밀번호 변경
+  - [x] 로그아웃
+- [x] 팀 설정 (`app/settings/TeamSettings.tsx`) - 관리자 전용
+  - [x] OpenAI API Key 설정
+  - [x] Confluence 연동 설정
+  - [x] Slack 연동 설정
+- [x] 팀 멤버 관리 (`app/settings/TeamMembers.tsx`) - 관리자 전용
+  - [x] 멤버 목록 조회
+  - [x] 관리자 권한 부여/해제
 
 ### Phase 5: 다크 모드
 
@@ -225,3 +232,4 @@ app/
 | 2025-01-15 | Phase 2 완료 (회의록 목록/상세 페이지)                             |
 | 2025-12-12 | Phase 3 완료 (파일 업로드 + 회의록 생성)                           |
 | 2025-12-12 | API 명세 동기화 (프로필 경로 변경, 토큰 경로 변경, 파일 제한 수정) |
+| 2025-12-12 | Phase 4 완료 (설정 페이지 - 프로필, 팀 설정, 멤버 관리)            |
