@@ -8,8 +8,10 @@ const NO_TRAILING_SLASH_PATHS = [
   'users/auth/signup',
   'users/auth/check-email',
   'users/auth/logout',
-  'users/auth/token/refresh',
-  'users/profile',
+  'users/token/refresh',
+  'users/profile/me',
+  'users/profile/update',
+  'users/profile/change-password',
 ];
 
 function buildApiPath(path: string[]): string {
@@ -25,10 +27,36 @@ function buildApiPath(path: string[]): string {
 export async function POST(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
   const apiPath = buildApiPath(path);
+  const fullUrl = `${API_BASE_URL}/${apiPath}`;
+  const contentType = request.headers.get('content-type') || '';
+  const authHeader = request.headers.get('Authorization');
 
   try {
+    // multipart/form-data 처리 (파일 업로드)
+    if (contentType.includes('multipart/form-data')) {
+      console.log('[PROXY POST FormData]', fullUrl);
+
+      const formData = await request.formData();
+      const headers: Record<string, string> = {};
+
+      if (authHeader) {
+        headers['Authorization'] = authHeader;
+      }
+      // Content-Type은 설정하지 않음 - fetch가 자동으로 boundary 포함하여 설정
+
+      const response = await fetch(fullUrl, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log('[PROXY POST FormData Response]', response.status);
+      return NextResponse.json(data, { status: response.status });
+    }
+
+    // JSON 처리 (기존 로직)
     const body = await request.json();
-    const authHeader = request.headers.get('Authorization');
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -38,7 +66,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       headers['Authorization'] = authHeader;
     }
 
-    const response = await fetch(`${API_BASE_URL}/${apiPath}`, {
+    const response = await fetch(fullUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
@@ -46,7 +74,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });
-  } catch {
+  } catch (error) {
+    console.error('[PROXY POST Error]', error);
     return NextResponse.json(
       { success: false, error: { code: '50000', message: '서버에 연결할 수 없습니다' }, data: null },
       { status: 500 }

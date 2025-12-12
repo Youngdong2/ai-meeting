@@ -137,7 +137,7 @@ async function refreshAccessToken(): Promise<boolean> {
   if (!refreshToken) return false;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/users/auth/token/refresh`, {
+    const response = await fetch(`${API_BASE_URL}/users/token/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh: refreshToken }),
@@ -207,7 +207,7 @@ export const authApi = {
       };
     }
 
-    const response = await fetchApi<RefreshTokenResponse>('/users/auth/token/refresh', {
+    const response = await fetchApi<RefreshTokenResponse>('/users/token/refresh', {
       method: 'POST',
       body: JSON.stringify({ refresh: refreshToken }),
     });
@@ -223,12 +223,12 @@ export const authApi = {
 // Profile API
 export const profileApi = {
   getProfile: async (): Promise<ApiResponse<User>> => {
-    return fetchApi<User>('/users/profile', { method: 'GET' }, true);
+    return fetchApi<User>('/users/profile/me', { method: 'GET' }, true);
   },
 
   updateProfile: async (request: UpdateProfileRequest): Promise<ApiResponse<UpdateProfileResponse>> => {
     return fetchApi<UpdateProfileResponse>(
-      '/users/profile',
+      '/users/profile/update',
       {
         method: 'PATCH',
         body: JSON.stringify(request),
@@ -239,9 +239,9 @@ export const profileApi = {
 
   changePassword: async (request: ChangePasswordRequest): Promise<ApiResponse<ChangePasswordResponse>> => {
     return fetchApi<ChangePasswordResponse>(
-      '/users/profile/password',
+      '/users/profile/change-password',
       {
-        method: 'PUT',
+        method: 'POST',
         body: JSON.stringify(request),
       },
       true
@@ -249,7 +249,7 @@ export const profileApi = {
   },
 
   deleteAccount: async (): Promise<ApiResponse<{ message: string }>> => {
-    return fetchApi<{ message: string }>('/users/profile', { method: 'DELETE' }, true);
+    return fetchApi<{ message: string }>('/users/profile/me', { method: 'DELETE' }, true);
   },
 };
 
@@ -333,7 +333,7 @@ export const meetingApi = {
     return fetchApi<Meeting>(`/meetings/${meetingId}/`, { method: 'GET' }, true);
   },
 
-  // 회의록 생성 (음성 파일 업로드는 별도)
+  // 회의록 생성 (JSON only)
   create: async (request: CreateMeetingRequest): Promise<ApiResponse<Meeting>> => {
     return fetchApi<Meeting>(
       '/meetings/',
@@ -343,6 +343,62 @@ export const meetingApi = {
       },
       true
     );
+  },
+
+  // 회의록 생성 (파일 업로드 포함)
+  createWithFile: async (
+    title: string,
+    meetingDate: string,
+    audioFile?: File
+  ): Promise<ApiResponse<Meeting>> => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('meeting_date', meetingDate);
+    if (audioFile) {
+      formData.append('audio_file', audioFile);
+    }
+
+    const accessToken = tokenManager.getAccessToken();
+    const headers: Record<string, string> = {};
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    // Content-Type은 설정하지 않음 - fetch가 자동으로 boundary 포함하여 설정
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/meetings/`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      const result: ApiResponse<Meeting> = await response.json();
+
+      // Handle token expiration
+      if (!result.success && result.error?.code === ERROR_CODES.TOKEN_EXPIRED) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          // Retry with new token
+          return meetingApi.createWithFile(title, meetingDate, audioFile);
+        } else {
+          tokenManager.clearTokens();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
+        }
+      }
+
+      return result;
+    } catch {
+      return {
+        success: false,
+        error: {
+          code: ERROR_CODES.SERVER_ERROR,
+          message: '서버에 연결할 수 없습니다',
+        },
+        data: null,
+      };
+    }
   },
 
   // 회의록 수정
