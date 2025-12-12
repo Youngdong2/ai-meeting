@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import TeamSelector from '@/app/components/team/TeamSelector';
 
 const navItems = [
   {
@@ -91,8 +92,14 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-14 bottom-0 w-60 bg-[var(--background-secondary)] border-r border-[var(--border-light)]">
-      <nav className="p-4">
+    <aside className="fixed left-0 top-14 bottom-0 w-60 bg-[var(--background-secondary)] border-r border-[var(--border-light)] flex flex-col">
+      {/* Team Selector */}
+      <div className="relative border-b border-[var(--border-light)]">
+        <TeamSelector />
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4">
         <ul className="space-y-1">
           {navItems.map((item) => {
             const isActive =
