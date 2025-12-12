@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { Header, BottomNavigation, MobileContainer } from './components/layout';
+import { Header, Sidebar } from './components/layout';
 import { AuthProvider } from './contexts/AuthContext';
+import { TeamProvider } from './contexts/TeamContext';
+import { MeetingProvider } from './contexts/MeetingContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,9 +24,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -36,9 +35,15 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
-          <Header />
-          <MobileContainer>{children}</MobileContainer>
-          <BottomNavigation />
+          <TeamProvider>
+            <MeetingProvider>
+              <Header />
+              <Sidebar />
+              <main className="ml-60 pt-14 min-h-screen bg-[var(--background)]">
+                <div className="max-w-6xl mx-auto px-8 py-8">{children}</div>
+              </main>
+            </MeetingProvider>
+          </TeamProvider>
         </AuthProvider>
       </body>
     </html>

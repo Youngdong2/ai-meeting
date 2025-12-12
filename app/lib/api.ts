@@ -15,6 +15,24 @@ import {
   User,
   ERROR_CODES,
   ERROR_MESSAGES,
+  // Team types
+  Team,
+  TeamSetting,
+  TeamSettingUpdateRequest,
+  TeamMember,
+  CreateTeamRequest,
+  // Meeting types
+  Meeting,
+  MeetingListItem,
+  MeetingStatusResponse,
+  CreateMeetingRequest,
+  UpdateMeetingRequest,
+  UpdateSpeakersRequest,
+  SpeakerMapping,
+  MeetingSearchParams,
+  MeetingSearchResponse,
+  ConfluenceStatusResponse,
+  SlackStatusResponse,
 } from '@/app/types/api';
 
 // Use Next.js API proxy to avoid CORS issues
@@ -232,6 +250,214 @@ export const profileApi = {
 
   deleteAccount: async (): Promise<ApiResponse<{ message: string }>> => {
     return fetchApi<{ message: string }>('/users/profile', { method: 'DELETE' }, true);
+  },
+};
+
+// Team API
+export const teamApi = {
+  // 팀 목록 조회
+  list: async (): Promise<ApiResponse<Team[]>> => {
+    return fetchApi<Team[]>('/teams/', { method: 'GET' }, true);
+  },
+
+  // 팀 생성
+  create: async (request: CreateTeamRequest): Promise<ApiResponse<Team>> => {
+    return fetchApi<Team>(
+      '/teams/',
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+  },
+
+  // 팀 상세 조회
+  get: async (teamId: number): Promise<ApiResponse<Team>> => {
+    return fetchApi<Team>(`/teams/${teamId}/`, { method: 'GET' }, true);
+  },
+
+  // 팀 설정 조회 (팀 관리자만)
+  getSettings: async (teamId: number): Promise<ApiResponse<TeamSetting>> => {
+    return fetchApi<TeamSetting>(`/teams/${teamId}/settings`, { method: 'GET' }, true);
+  },
+
+  // 팀 설정 수정 (팀 관리자만)
+  updateSettings: async (
+    teamId: number,
+    request: TeamSettingUpdateRequest
+  ): Promise<ApiResponse<TeamSetting>> => {
+    return fetchApi<TeamSetting>(
+      `/teams/${teamId}/settings`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+  },
+
+  // 팀 멤버 목록 조회
+  getMembers: async (teamId: number): Promise<ApiResponse<TeamMember[]>> => {
+    return fetchApi<TeamMember[]>(`/teams/${teamId}/members`, { method: 'GET' }, true);
+  },
+
+  // 팀 관리자 권한 부여 (팀 관리자만)
+  grantAdmin: async (teamId: number, userId: number): Promise<ApiResponse<{ message: string }>> => {
+    return fetchApi<{ message: string }>(
+      `/teams/${teamId}/members/${userId}/admin`,
+      { method: 'POST' },
+      true
+    );
+  },
+
+  // 팀 관리자 권한 해제 (팀 관리자만)
+  revokeAdmin: async (teamId: number, userId: number): Promise<ApiResponse<{ message: string }>> => {
+    return fetchApi<{ message: string }>(
+      `/teams/${teamId}/members/${userId}/admin`,
+      { method: 'DELETE' },
+      true
+    );
+  },
+};
+
+// Meeting API
+export const meetingApi = {
+  // 회의록 목록 조회
+  list: async (): Promise<ApiResponse<MeetingListItem[]>> => {
+    return fetchApi<MeetingListItem[]>('/meetings/', { method: 'GET' }, true);
+  },
+
+  // 회의록 상세 조회
+  get: async (meetingId: number): Promise<ApiResponse<Meeting>> => {
+    return fetchApi<Meeting>(`/meetings/${meetingId}/`, { method: 'GET' }, true);
+  },
+
+  // 회의록 생성 (음성 파일 업로드는 별도)
+  create: async (request: CreateMeetingRequest): Promise<ApiResponse<Meeting>> => {
+    return fetchApi<Meeting>(
+      '/meetings/',
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+  },
+
+  // 회의록 수정
+  update: async (meetingId: number, request: UpdateMeetingRequest): Promise<ApiResponse<Meeting>> => {
+    return fetchApi<Meeting>(
+      `/meetings/${meetingId}/`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+  },
+
+  // 회의록 삭제
+  delete: async (meetingId: number): Promise<ApiResponse<void>> => {
+    return fetchApi<void>(`/meetings/${meetingId}/`, { method: 'DELETE' }, true);
+  },
+
+  // 처리 상태 조회 (폴링용)
+  getStatus: async (meetingId: number): Promise<ApiResponse<MeetingStatusResponse>> => {
+    return fetchApi<MeetingStatusResponse>(`/meetings/${meetingId}/status`, { method: 'GET' }, true);
+  },
+
+  // 화자 목록 조회
+  getSpeakers: async (meetingId: number): Promise<ApiResponse<SpeakerMapping[]>> => {
+    return fetchApi<SpeakerMapping[]>(`/meetings/${meetingId}/speakers`, { method: 'GET' }, true);
+  },
+
+  // 화자 이름 일괄 매핑
+  updateSpeakers: async (
+    meetingId: number,
+    request: UpdateSpeakersRequest
+  ): Promise<ApiResponse<SpeakerMapping[]>> => {
+    return fetchApi<SpeakerMapping[]>(
+      `/meetings/${meetingId}/speakers`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(request),
+      },
+      true
+    );
+  },
+
+  // STT 수동 재실행
+  transcribe: async (meetingId: number): Promise<ApiResponse<{ message: string; status: string }>> => {
+    return fetchApi<{ message: string; status: string }>(
+      `/meetings/${meetingId}/transcribe`,
+      { method: 'POST' },
+      true
+    );
+  },
+
+  // 요약 수동 재생성
+  summarize: async (meetingId: number): Promise<ApiResponse<{ message: string; status: string }>> => {
+    return fetchApi<{ message: string; status: string }>(
+      `/meetings/${meetingId}/summarize`,
+      { method: 'POST' },
+      true
+    );
+  },
+
+  // 회의록 검색
+  search: async (params: MeetingSearchParams): Promise<ApiResponse<MeetingSearchResponse>> => {
+    const queryParams = new URLSearchParams();
+    if (params.q) queryParams.append('q', params.q);
+    if (params.field) queryParams.append('field', params.field);
+
+    return fetchApi<MeetingSearchResponse>(
+      `/meetings/search?${queryParams.toString()}`,
+      { method: 'GET' },
+      true
+    );
+  },
+
+  // Confluence 업로드
+  uploadToConfluence: async (meetingId: number): Promise<ApiResponse<{ message: string }>> => {
+    return fetchApi<{ message: string }>(
+      `/meetings/${meetingId}/confluence/upload`,
+      { method: 'POST' },
+      true
+    );
+  },
+
+  // Confluence 상태 확인
+  getConfluenceStatus: async (meetingId: number): Promise<ApiResponse<ConfluenceStatusResponse>> => {
+    return fetchApi<ConfluenceStatusResponse>(
+      `/meetings/${meetingId}/confluence/status`,
+      { method: 'GET' },
+      true
+    );
+  },
+
+  // Slack 공유
+  shareToSlack: async (
+    meetingId: number,
+    channel?: string
+  ): Promise<ApiResponse<{ message: string }>> => {
+    return fetchApi<{ message: string }>(
+      `/meetings/${meetingId}/slack/share`,
+      {
+        method: 'POST',
+        body: channel ? JSON.stringify({ channel }) : undefined,
+      },
+      true
+    );
+  },
+
+  // Slack 상태 확인
+  getSlackStatus: async (meetingId: number): Promise<ApiResponse<SlackStatusResponse>> => {
+    return fetchApi<SlackStatusResponse>(
+      `/meetings/${meetingId}/slack/status`,
+      { method: 'GET' },
+      true
+    );
   },
 };
 

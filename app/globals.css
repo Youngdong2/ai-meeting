@@ -164,9 +164,24 @@ body {
   text-decoration: underline;
 }
 
-/* Safe area for bottom navigation (iOS) */
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+/* Card styles for desktop */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Grid layouts for desktop */
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
 }
 
 /* Apple-style scrollbar - Hidden by default, show on hover */

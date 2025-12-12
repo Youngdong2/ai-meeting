@@ -2,9 +2,29 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = 'http://192.168.230.104:8022/v1';
 
+// Paths that should NOT have trailing slash
+const NO_TRAILING_SLASH_PATHS = [
+  'users/auth/login',
+  'users/auth/signup',
+  'users/auth/check-email',
+  'users/auth/logout',
+  'users/auth/token/refresh',
+  'users/profile',
+];
+
+function buildApiPath(path: string[]): string {
+  const joinedPath = path.join('/');
+  // Check if path matches any no-trailing-slash pattern
+  if (NO_TRAILING_SLASH_PATHS.some((p) => joinedPath === p || joinedPath.startsWith(p + '/'))) {
+    return joinedPath;
+  }
+  // Add trailing slash for Django backend compatibility
+  return joinedPath + '/';
+}
+
 export async function POST(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
-  const apiPath = path.join('/');
+  const apiPath = buildApiPath(path);
 
   try {
     const body = await request.json();
@@ -36,10 +56,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
-  const apiPath = path.join('/');
+  const apiPath = buildApiPath(path);
+  const fullUrl = `${API_BASE_URL}/${apiPath}`;
+
+  const authHeader = request.headers.get('Authorization');
+  console.log('[PROXY GET]', fullUrl, 'Auth:', authHeader ? 'Bearer ***' : 'NONE');
 
   try {
-    const authHeader = request.headers.get('Authorization');
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -49,12 +72,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       headers['Authorization'] = authHeader;
     }
 
-    const response = await fetch(`${API_BASE_URL}/${apiPath}`, {
+    const response = await fetch(fullUrl, {
       method: 'GET',
       headers,
     });
 
     const data = await response.json();
+    console.log('[PROXY GET Response]', response.status, JSON.stringify(data).slice(0, 200));
     return NextResponse.json(data, { status: response.status });
   } catch {
     return NextResponse.json(
@@ -66,7 +90,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
-  const apiPath = path.join('/');
+  const apiPath = buildApiPath(path);
 
   try {
     const body = await request.json();
@@ -98,7 +122,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
-  const apiPath = path.join('/');
+  const apiPath = buildApiPath(path);
 
   try {
     const body = await request.json();
@@ -130,7 +154,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
-  const apiPath = path.join('/');
+  const apiPath = buildApiPath(path);
 
   try {
     const authHeader = request.headers.get('Authorization');

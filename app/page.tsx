@@ -1,8 +1,42 @@
+'use client';
+
+import { useEffect } from 'react';
 import Link from 'next/link';
-import { getRecentMeetings } from './data/mockMeetings';
+import { useMeeting } from '@/app/contexts/MeetingContext';
+import { useTeam } from '@/app/contexts/TeamContext';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { MeetingStatusBadge } from '@/app/components/meeting';
 
 export default function Home() {
-  const recentMeetings = getRecentMeetings(3);
+  const { meetings, isLoading: meetingsLoading, fetchMeetings } = useMeeting();
+  const { currentTeam, isLoading: teamLoading } = useTeam();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (isAuthenticated && currentTeam) {
+      fetchMeetings();
+    }
+  }, [isAuthenticated, currentTeam, fetchMeetings]);
+
+  // 최근 3개 회의록
+  const recentMeetings = meetings.slice(0, 3);
+
+  // 날짜 포맷팅
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  // 통계 계산
+  const completedCount = meetings.filter((m) => m.status === 'completed').length;
+  const processingCount = meetings.filter(
+    (m) => m.status !== 'completed' && m.status !== 'failed'
+  ).length;
+
+  const isLoading = authLoading || teamLoading;
 
   return (
     <div className="py-8 space-y-16">
@@ -79,7 +113,7 @@ export default function Home() {
           <div>
             <h2 className="text-headline-3">최근 회의록</h2>
             <p className="text-body text-[var(--text-secondary)] mt-1">
-              최근에 요약된 회의록입니다
+              {currentTeam ? `${currentTeam.name}의 최근 회의록입니다` : '최근에 요약된 회의록입니다'}
             </p>
           </div>
           <Link href="/meetings" className="link-apple text-[17px]">
@@ -87,51 +121,99 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="space-y-0 divide-y divide-[var(--border-light)]">
-          {recentMeetings.map((meeting) => (
-            <Link
-              key={meeting.id}
-              href={`/meetings/${meeting.id}`}
-              className="block py-6 hover:bg-[var(--background-secondary)] -mx-6 px-6 transition-colors"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="text-eyebrow text-[var(--text-primary)]">{meeting.title}</h3>
+        {/* Loading State */}
+        {(isLoading || meetingsLoading) && (
+          <div className="space-y-0 divide-y divide-[var(--border-light)]">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="py-6 animate-pulse">
+                <div className="h-5 w-48 bg-[var(--border-light)] rounded mb-3" />
+                <div className="h-4 w-full bg-[var(--border-light)] rounded mb-2" />
+                <div className="h-4 w-24 bg-[var(--border-light)] rounded" />
               </div>
-              <p className="text-body text-[var(--text-secondary)] line-clamp-2 mb-3">
-                {meeting.summary}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="text-caption text-[var(--text-tertiary)]">{meeting.date}</span>
-                <span className="text-caption text-[var(--text-tertiary)]">·</span>
-                <span className="text-caption text-[var(--text-tertiary)]">{meeting.duration}</span>
-                <span className="text-caption text-[var(--text-tertiary)]">·</span>
-                <span className="text-caption text-[var(--text-tertiary)]">
-                  {meeting.participants.length}명 참석
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !meetingsLoading && recentMeetings.length === 0 && (
+          <div className="text-center py-12 border border-dashed border-[var(--border-light)] rounded-2xl">
+            <p className="text-[var(--text-secondary)] mb-4">
+              {!isAuthenticated
+                ? '로그인하여 회의록을 확인하세요'
+                : !currentTeam
+                  ? '팀을 선택해주세요'
+                  : '아직 회의록이 없습니다'}
+            </p>
+            {isAuthenticated && currentTeam && (
+              <Link href="/upload" className="link-apple">
+                첫 회의록 만들기 →
+              </Link>
+            )}
+            {!isAuthenticated && (
+              <Link href="/login" className="link-apple">
+                로그인하기 →
+              </Link>
+            )}
+          </div>
+        )}
+
+        {/* Meeting List */}
+        {!isLoading && !meetingsLoading && recentMeetings.length > 0 && (
+          <div className="space-y-0 divide-y divide-[var(--border-light)]">
+            {recentMeetings.map((meeting) => (
+              <Link
+                key={meeting.id}
+                href={`/meetings/${meeting.id}`}
+                className="block py-6 hover:bg-[var(--background-secondary)] -mx-6 px-6 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h3 className="text-eyebrow text-[var(--text-primary)]">{meeting.title}</h3>
+                  <MeetingStatusBadge status={meeting.status} />
+                </div>
+                {meeting.summary && (
+                  <p className="text-body text-[var(--text-secondary)] line-clamp-2 mb-3">
+                    {meeting.summary}
+                  </p>
+                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-caption text-[var(--text-tertiary)]">
+                    {formatDate(meeting.created_at)}
+                  </span>
+                  {meeting.duration && (
+                    <>
+                      <span className="text-caption text-[var(--text-tertiary)]">·</span>
+                      <span className="text-caption text-[var(--text-tertiary)]">
+                        {Math.floor(meeting.duration / 60)}분
+                      </span>
+                    </>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Stats */}
-      <section className="space-y-8">
-        <h2 className="text-headline-3">한눈에 보기</h2>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center py-6">
-            <p className="text-headline-2 text-[var(--link)]">5</p>
-            <p className="text-caption text-[var(--text-secondary)] mt-2">총 회의록</p>
+      {isAuthenticated && currentTeam && (
+        <section className="space-y-8">
+          <h2 className="text-headline-3">한눈에 보기</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center py-6">
+              <p className="text-headline-2 text-[var(--link)]">{meetings.length}</p>
+              <p className="text-caption text-[var(--text-secondary)] mt-2">총 회의록</p>
+            </div>
+            <div className="text-center py-6 border-x border-[var(--border-light)]">
+              <p className="text-headline-2 text-[#34c759]">{completedCount}</p>
+              <p className="text-caption text-[var(--text-secondary)] mt-2">완료됨</p>
+            </div>
+            <div className="text-center py-6">
+              <p className="text-headline-2 text-[#ff9500]">{processingCount}</p>
+              <p className="text-caption text-[var(--text-secondary)] mt-2">처리중</p>
+            </div>
           </div>
-          <div className="text-center py-6 border-x border-[var(--border-light)]">
-            <p className="text-headline-2 text-[#34c759]">3</p>
-            <p className="text-caption text-[var(--text-secondary)] mt-2">완료된 할일</p>
-          </div>
-          <div className="text-center py-6">
-            <p className="text-headline-2 text-[#ff9500]">7</p>
-            <p className="text-caption text-[var(--text-secondary)] mt-2">진행중 할일</p>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

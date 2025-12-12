@@ -18,7 +18,200 @@ export interface User {
   gender: 'M' | 'F';
   birth_date: string;
   phone_number: string;
+  team: TeamBasic | null;
+  is_team_admin: boolean;
   created_at: string;
+}
+
+// Team Types
+export interface TeamBasic {
+  id: number;
+  name: string;
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  description: string;
+  member_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TeamSetting {
+  id: number;
+  openai_api_key_set: boolean;
+  confluence_site_url: string | null;
+  confluence_space_key: string | null;
+  confluence_configured: boolean;
+  slack_webhook_configured: boolean;
+  slack_bot_configured: boolean;
+  slack_default_channel: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TeamSettingUpdateRequest {
+  openai_api_key?: string;
+  confluence_site_url?: string;
+  confluence_api_token?: string;
+  confluence_user_email?: string;
+  confluence_space_key?: string;
+  confluence_parent_page_id?: string;
+  slack_webhook_url?: string;
+  slack_bot_token?: string;
+  slack_default_channel?: string;
+}
+
+export interface TeamMember {
+  id: number;
+  username: string;
+  email: string;
+  is_team_admin: boolean;
+}
+
+export interface CreateTeamRequest {
+  name: string;
+  description?: string;
+}
+
+// Meeting Types
+export type MeetingStatus =
+  | 'pending'
+  | 'compressing'
+  | 'transcribing'
+  | 'correcting'
+  | 'summarizing'
+  | 'completed'
+  | 'failed';
+
+export const MEETING_STATUS_DISPLAY: Record<MeetingStatus, string> = {
+  pending: '처리 대기',
+  compressing: '압축 중...',
+  transcribing: '음성 인식 중...',
+  correcting: '텍스트 교정 중...',
+  summarizing: '요약 생성 중...',
+  completed: '완료',
+  failed: '실패',
+};
+
+export interface MeetingListItem {
+  id: number;
+  title: string;
+  meeting_date: string;
+  status: MeetingStatus;
+  status_display: string;
+  has_audio: boolean;
+  created_by_name: string;
+  created_at: string;
+  updated_at: string;
+  // Optional fields from API
+  summary?: string | null;
+  duration?: number | null;
+  team?: TeamBasic | null;
+}
+
+export interface SpeakerData {
+  speaker: string;
+  text: string;
+  start: number;
+  end: number;
+}
+
+export interface SpeakerMapping {
+  id: number | null;
+  speaker_label: string;
+  speaker_name: string;
+  created_at: string | null;
+}
+
+export interface Meeting {
+  id: number;
+  title: string;
+  meeting_date: string;
+  audio_file_url: string | null;
+  audio_file_expires_at: string | null;
+  has_audio: boolean;
+  transcript: string | null;
+  speaker_data: SpeakerData[] | null;
+  corrected_transcript: string | null;
+  summary: string | null;
+  status: MeetingStatus;
+  status_display: string;
+  error_message: string;
+  confluence_page_id: string | null;
+  confluence_page_url: string | null;
+  slack_message_ts: string | null;
+  slack_channel: string | null;
+  speaker_mappings: SpeakerMapping[];
+  created_by_name: string;
+  created_at: string;
+  updated_at: string;
+  // Optional fields from API
+  duration?: number | null;
+  full_script?: string | null;
+  key_points?: string[] | null;
+  action_items?: string[] | null;
+}
+
+export interface MeetingStatusResponse {
+  id: number;
+  status: MeetingStatus;
+  status_display: string;
+  error_message: string;
+}
+
+export interface CreateMeetingRequest {
+  title: string;
+  meeting_date: string;
+}
+
+export interface UpdateMeetingRequest {
+  title?: string;
+  meeting_date?: string;
+  summary?: string;
+  corrected_transcript?: string;
+}
+
+export interface UpdateSpeakersRequest {
+  mappings: Array<{
+    speaker_label: string;
+    speaker_name: string;
+  }>;
+}
+
+export interface MeetingSearchParams {
+  q?: string;
+  field?: 'all' | 'title' | 'transcript' | 'summary';
+}
+
+export interface MeetingSearchResult {
+  id: number;
+  title: string;
+  meeting_date: string;
+  summary_preview: string;
+  transcript_preview: string;
+  created_by_name: string;
+  created_at: string;
+}
+
+export interface MeetingSearchResponse {
+  results: MeetingSearchResult[];
+  count: number;
+  query: string;
+  field: string;
+}
+
+export interface ConfluenceStatusResponse {
+  uploaded: boolean;
+  page_id: string | null;
+  page_url: string | null;
+}
+
+export interface SlackStatusResponse {
+  shared: boolean;
+  message_ts: string | null;
+  channel: string | null;
 }
 
 // Auth Types
