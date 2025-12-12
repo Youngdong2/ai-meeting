@@ -3,11 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTeam } from '@/app/contexts/TeamContext';
 import { useAuth } from '@/app/contexts/AuthContext';
+import CreateTeamModal from './CreateTeamModal';
 
 export default function TeamSelector() {
   const { teams, currentTeam, isLoading, setCurrentTeam } = useTeam();
   const { isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭시 드롭다운 닫기
@@ -36,11 +38,23 @@ export default function TeamSelector() {
 
   if (teams.length === 0) {
     return (
-      <div className="px-3 py-2">
-        <div className="text-[13px] text-[var(--text-secondary)] text-center py-2">
-          소속된 팀이 없습니다
+      <>
+        <div className="px-3 py-2">
+          <div className="text-[13px] text-[var(--text-secondary)] text-center py-2">
+            소속된 팀이 없습니다
+          </div>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 mt-1 text-[14px] font-medium text-[var(--link)] hover:bg-[var(--border-light)] rounded-lg transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            새 팀 만들기
+          </button>
         </div>
-      </div>
+        <CreateTeamModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      </>
     );
   }
 
@@ -109,8 +123,24 @@ export default function TeamSelector() {
               </button>
             ))}
           </div>
+          <div className="border-t border-[var(--border-light)]">
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                setIsCreateModalOpen(true);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2.5 text-[14px] font-medium text-[var(--link)] hover:bg-[var(--border-light)] transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              새 팀 만들기
+            </button>
+          </div>
         </div>
       )}
+
+      <CreateTeamModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
     </div>
   );
 }

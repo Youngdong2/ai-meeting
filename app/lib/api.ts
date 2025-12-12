@@ -20,6 +20,7 @@ import {
   TeamSetting,
   TeamSettingUpdateRequest,
   TeamMember,
+  CreateTeamRequest,
   // Meeting types
   Meeting,
   MeetingListItem,
@@ -257,6 +258,18 @@ export const teamApi = {
   // 팀 목록 조회
   list: async (): Promise<ApiResponse<Team[]>> => {
     return fetchApi<Team[]>('/teams/', { method: 'GET' }, true);
+  },
+
+  // 팀 생성
+  create: async (request: CreateTeamRequest): Promise<ApiResponse<Team>> => {
+    return fetchApi<Team>(
+      '/teams/',
+      {
+        method: 'POST',
+        body: JSON.stringify(request),
+      },
+      true
+    );
   },
 
   // 팀 상세 조회

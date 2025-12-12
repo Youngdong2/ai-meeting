@@ -70,6 +70,11 @@ export interface TeamMember {
   is_team_admin: boolean;
 }
 
+export interface CreateTeamRequest {
+  name: string;
+  description?: string;
+}
+
 // Meeting Types
 export type MeetingStatus =
   | 'pending'
@@ -100,6 +105,10 @@ export interface MeetingListItem {
   created_by_name: string;
   created_at: string;
   updated_at: string;
+  // Optional fields from API
+  summary?: string | null;
+  duration?: number | null;
+  team?: TeamBasic | null;
 }
 
 export interface SpeakerData {
@@ -138,6 +147,11 @@ export interface Meeting {
   created_by_name: string;
   created_at: string;
   updated_at: string;
+  // Optional fields from API
+  duration?: number | null;
+  full_script?: string | null;
+  key_points?: string[] | null;
+  action_items?: string[] | null;
 }
 
 export interface MeetingStatusResponse {

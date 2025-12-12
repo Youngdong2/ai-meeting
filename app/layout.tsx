@@ -4,6 +4,7 @@ import './globals.css';
 import { Header, Sidebar } from './components/layout';
 import { AuthProvider } from './contexts/AuthContext';
 import { TeamProvider } from './contexts/TeamContext';
+import { MeetingProvider } from './contexts/MeetingContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,11 +36,13 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <TeamProvider>
-            <Header />
-            <Sidebar />
-            <main className="ml-60 pt-14 min-h-screen bg-[var(--background)]">
-              <div className="max-w-6xl mx-auto px-8 py-8">{children}</div>
-            </main>
+            <MeetingProvider>
+              <Header />
+              <Sidebar />
+              <main className="ml-60 pt-14 min-h-screen bg-[var(--background)]">
+                <div className="max-w-6xl mx-auto px-8 py-8">{children}</div>
+              </main>
+            </MeetingProvider>
           </TeamProvider>
         </AuthProvider>
       </body>

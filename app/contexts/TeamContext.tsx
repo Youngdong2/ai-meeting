@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
-import { Team } from '@/app/types/api';
+import { Team, CreateTeamRequest } from '@/app/types/api';
 import { teamApi, tokenManager } from '@/app/lib/api';
 
 interface TeamContextType {
@@ -11,6 +11,7 @@ interface TeamContextType {
   error: string | null;
   setCurrentTeam: (team: Team) => void;
   refreshTeams: () => Promise<void>;
+  createTeam: (request: CreateTeamRequest) => Promise<{ success: boolean; error?: string }>;
 }
 
 const TeamContext = createContext<TeamContextType | undefined>(undefined);
@@ -107,6 +108,30 @@ export function TeamProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(CURRENT_TEAM_KEY, team.id.toString());
   }, []);
 
+  const createTeam = useCallback(
+    async (request: CreateTeamRequest): Promise<{ success: boolean; error?: string }> => {
+      const response = await teamApi.create(request);
+
+      if (response.success && response.data && response.data.id) {
+        // 팀 목록에 새 팀 추가
+        setTeams((prev) => [...prev, response.data!]);
+        // 새로 생성한 팀을 현재 팀으로 설정
+        setCurrentTeamState(response.data);
+        localStorage.setItem(CURRENT_TEAM_KEY, response.data.id.toString());
+        return { success: true };
+      }
+
+      // 팀은 생성되었지만 응답 데이터가 불완전한 경우 팀 목록 새로고침
+      if (response.success) {
+        await refreshTeams();
+        return { success: true };
+      }
+
+      return { success: false, error: response.error?.message || '팀 생성에 실패했습니다' };
+    },
+    [refreshTeams]
+  );
+
   return (
     <TeamContext.Provider
       value={{
@@ -116,6 +141,7 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         error,
         setCurrentTeam,
         refreshTeams,
+        createTeam,
       }}
     >
       {children}
