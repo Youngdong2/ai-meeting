@@ -136,26 +136,30 @@ export interface Meeting {
   audio_file_url: string | null;
   audio_file_expires_at: string | null;
   has_audio: boolean;
+  // STT 결과
   transcript: string | null;
   speaker_data: SpeakerData[] | null;
+  // AI 교정된 텍스트
   corrected_transcript: string | null;
+  corrected_speaker_data: SpeakerData[] | null;
+  // 화자 이름 매핑이 적용된 대화형 데이터
+  chat_transcript: SpeakerData[] | null;
+  // AI 요약
   summary: string | null;
   status: MeetingStatus;
   status_display: string;
   error_message: string;
+  // 외부 서비스 연동
   confluence_page_id: string | null;
   confluence_page_url: string | null;
   slack_message_ts: string | null;
   slack_channel: string | null;
+  // 화자 매핑
   speaker_mappings: SpeakerMapping[];
   created_by_name: string;
   created_at: string;
   updated_at: string;
-  // Optional fields from API
   duration?: number | null;
-  full_script?: string | null;
-  key_points?: string[] | null;
-  action_items?: string[] | null;
 }
 
 export interface MeetingStatusResponse {
