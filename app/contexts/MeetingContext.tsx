@@ -3,7 +3,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { Meeting, MeetingListItem } from '@/app/types/api';
 import { meetingApi, tokenManager } from '@/app/lib/api';
-import { useTeam } from './TeamContext';
 
 interface MeetingContextType {
   meetings: MeetingListItem[];
@@ -22,7 +21,6 @@ export function MeetingProvider({ children }: { children: ReactNode }) {
   const [currentMeeting, setCurrentMeeting] = useState<Meeting | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { currentTeam } = useTeam();
 
   const fetchMeetings = useCallback(async () => {
     if (!tokenManager.isAuthenticated()) {
@@ -36,17 +34,14 @@ export function MeetingProvider({ children }: { children: ReactNode }) {
     const response = await meetingApi.list();
 
     if (response.success && response.data) {
-      // 현재 팀의 회의록만 필터링 (API가 팀별 필터를 지원하지 않는 경우)
-      const filteredMeetings = currentTeam
-        ? response.data.filter((m) => m.team?.id === currentTeam.id)
-        : response.data;
-      setMeetings(filteredMeetings);
+      // 백엔드가 이미 사용자의 팀에 속한 회의록만 반환함
+      setMeetings(response.data);
     } else {
       setError(response.error?.message || '회의록 목록을 불러오는데 실패했습니다');
     }
 
     setIsLoading(false);
-  }, [currentTeam]);
+  }, []);
 
   const fetchMeeting = useCallback(async (id: number): Promise<Meeting | null> => {
     if (!tokenManager.isAuthenticated()) {

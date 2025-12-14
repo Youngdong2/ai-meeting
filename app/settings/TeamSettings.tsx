@@ -122,7 +122,7 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
           <h2 className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">
             OpenAI API
           </h2>
-          {settings?.openai_api_key_set && (
+          {settings?.openai_api_key && (
             <span className="px-2 py-1 bg-green-100 text-green-700 text-caption rounded">
               설정됨
             </span>
@@ -139,7 +139,7 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
               value={openaiApiKey}
               onChange={(e) => setOpenaiApiKey(e.target.value)}
               className="w-full px-4 py-3 border border-[var(--border)] rounded-xl text-body focus:outline-none focus:ring-2 focus:ring-[var(--link)]"
-              placeholder={settings?.openai_api_key_set ? '••••••••••••••••' : 'sk-...'}
+              placeholder={settings?.openai_api_key ? '••••••••••••••••' : 'sk-...'}
             />
           </div>
           <button
@@ -158,7 +158,7 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
           <h2 className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">
             Confluence 연동
           </h2>
-          {settings?.confluence_configured && (
+          {settings?.confluence_api_token && (
             <span className="px-2 py-1 bg-green-100 text-green-700 text-caption rounded">
               연동됨
             </span>
@@ -246,11 +246,6 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
           <h2 className="text-caption text-[var(--text-tertiary)] uppercase tracking-wide">
             Slack 연동
           </h2>
-          {(settings?.slack_webhook_configured || settings?.slack_bot_configured) && (
-            <span className="px-2 py-1 bg-green-100 text-green-700 text-caption rounded">
-              연동됨
-            </span>
-          )}
         </div>
         <div className="space-y-4 p-5 border border-[var(--border-light)] rounded-2xl">
           <p className="text-caption text-[var(--text-secondary)]">

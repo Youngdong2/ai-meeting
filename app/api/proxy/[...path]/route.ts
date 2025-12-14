@@ -16,9 +16,20 @@ const NO_TRAILING_SLASH_PATHS = [
 
 // Path patterns that should NOT have trailing slash (regex)
 const NO_TRAILING_SLASH_PATTERNS = [
-  /^teams\/\d+\/settings$/,      // teams/{id}/settings
-  /^teams\/\d+\/members$/,       // teams/{id}/members
+  /^teams\/\d+\/settings$/,         // teams/{id}/settings
+  /^teams\/\d+\/settings\/update$/, // teams/{id}/settings/update
+  /^teams\/\d+\/members$/,          // teams/{id}/members
   /^teams\/\d+\/members\/\d+\/admin$/, // teams/{id}/members/{user_id}/admin
+  /^meetings\/\d+$/,                // meetings/{id}
+  /^meetings\/\d+\/status$/,        // meetings/{id}/status
+  /^meetings\/\d+\/speakers$/,      // meetings/{id}/speakers
+  /^meetings\/\d+\/transcribe$/,    // meetings/{id}/transcribe
+  /^meetings\/\d+\/summarize$/,     // meetings/{id}/summarize
+  /^meetings\/\d+\/confluence\/upload$/,  // meetings/{id}/confluence/upload
+  /^meetings\/\d+\/confluence\/status$/,  // meetings/{id}/confluence/status
+  /^meetings\/\d+\/slack\/share$/,        // meetings/{id}/slack/share
+  /^meetings\/\d+\/slack\/status$/,       // meetings/{id}/slack/status
+  /^meetings\/search$/,             // meetings/search
 ];
 
 function buildApiPath(path: string[]): string {
@@ -131,10 +142,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
   const apiPath = buildApiPath(path);
+  const fullUrl = `${API_BASE_URL}/${apiPath}`;
+
+  const authHeader = request.headers.get('Authorization');
+  console.log('[PROXY PATCH]', fullUrl, 'Auth:', authHeader ? 'Bearer ***' : 'NONE');
 
   try {
     const body = await request.json();
-    const authHeader = request.headers.get('Authorization');
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -144,15 +158,17 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       headers['Authorization'] = authHeader;
     }
 
-    const response = await fetch(`${API_BASE_URL}/${apiPath}`, {
+    const response = await fetch(fullUrl, {
       method: 'PATCH',
       headers,
       body: JSON.stringify(body),
     });
 
     const data = await response.json();
+    console.log('[PROXY PATCH Response]', response.status, JSON.stringify(data).slice(0, 200));
     return NextResponse.json(data, { status: response.status });
-  } catch {
+  } catch (error) {
+    console.error('[PROXY PATCH Error]', error);
     return NextResponse.json(
       { success: false, error: { code: '50000', message: '서버에 연결할 수 없습니다' }, data: null },
       { status: 500 }
