@@ -101,6 +101,14 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       setError(null);
       chunksRef.current = [];
 
+      // HTTPS 또는 localhost 확인
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setError(
+          '이 브라우저에서는 녹음이 지원되지 않습니다. HTTPS 연결이 필요하거나 localhost에서 접속해주세요.'
+        );
+        return;
+      }
+
       // 마이크 권한 요청
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {

@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Team, CreateTeamRequest } from '@/app/types/api';
-import { teamApi, tokenManager } from '@/app/lib/api';
+import { teamApi } from '@/app/lib/api';
+import { useAuth } from './AuthContext';
 
 interface TeamContextType {
   teams: Team[];
@@ -19,13 +20,14 @@ const TeamContext = createContext<TeamContextType | undefined>(undefined);
 const CURRENT_TEAM_KEY = 'current_team_id';
 
 export function TeamProvider({ children }: { children: ReactNode }) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [teams, setTeams] = useState<Team[]>([]);
   const [currentTeam, setCurrentTeamState] = useState<Team | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const refreshTeams = useCallback(async () => {
-    if (!tokenManager.isAuthenticated()) {
+    if (!isAuthenticated) {
       setTeams([]);
       setCurrentTeamState(null);
       setIsLoading(false);
@@ -57,13 +59,20 @@ export function TeamProvider({ children }: { children: ReactNode }) {
     }
 
     setIsLoading(false);
-  }, []);
+  }, [isAuthenticated]);
 
+  // isAuthenticated 상태 변화 감지하여 팀 목록 가져오기
   useEffect(() => {
+    // 인증 로딩 중이면 대기
+    if (authLoading) {
+      return;
+    }
+
     let mounted = true;
 
-    const initTeams = async () => {
-      if (!tokenManager.isAuthenticated()) {
+    const handleAuthChange = async () => {
+      // 로그아웃된 경우 초기화
+      if (!isAuthenticated) {
         if (mounted) {
           setTeams([]);
           setCurrentTeamState(null);
@@ -72,6 +81,10 @@ export function TeamProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      // 로그인된 경우 팀 목록 가져오기
+      if (mounted) {
+        setIsLoading(true);
+      }
       const response = await teamApi.list();
 
       if (mounted) {
@@ -96,12 +109,12 @@ export function TeamProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    initTeams();
+    handleAuthChange();
 
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [isAuthenticated, authLoading]);
 
   const setCurrentTeam = useCallback((team: Team) => {
     setCurrentTeamState(team);

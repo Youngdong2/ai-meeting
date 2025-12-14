@@ -53,7 +53,7 @@ export default function Home() {
           핵심만 요약해드립니다.
         </p>
         <div className="flex items-center justify-center gap-4 pt-4">
-          <Link href="/upload" className="link-apple text-[17px]">
+          <Link href="/record" className="link-apple text-[17px]">
             새 회의록 만들기 →
           </Link>
         </div>
@@ -63,7 +63,7 @@ export default function Home() {
       <section className="space-y-6">
         <div className="grid grid-cols-2 gap-4">
           <Link
-            href="/upload"
+            href="/record"
             className="group flex flex-col items-center justify-center p-8 bg-[var(--background)] border border-[var(--border-light)] rounded-2xl hover:bg-[var(--background-secondary)] transition-all"
           >
             <div className="w-12 h-12 mb-4 flex items-center justify-center">
@@ -79,7 +79,7 @@ export default function Home() {
               </svg>
             </div>
             <span className="text-eyebrow text-[var(--text-primary)]">새 회의록</span>
-            <span className="text-body text-[var(--text-secondary)] mt-1">업로드하기</span>
+            <span className="text-body text-[var(--text-secondary)] mt-1">녹음하기</span>
           </Link>
           <Link
             href="/meetings"
@@ -145,7 +145,7 @@ export default function Home() {
                   : '아직 회의록이 없습니다'}
             </p>
             {isAuthenticated && currentTeam && (
-              <Link href="/upload" className="link-apple">
+              <Link href="/record" className="link-apple">
                 첫 회의록 만들기 →
               </Link>
             )}
