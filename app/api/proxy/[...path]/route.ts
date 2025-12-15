@@ -20,7 +20,6 @@ const NO_TRAILING_SLASH_PATTERNS = [
   /^teams\/\d+\/settings\/update$/, // teams/{id}/settings/update
   /^teams\/\d+\/members$/,          // teams/{id}/members
   /^teams\/\d+\/members\/\d+\/admin$/, // teams/{id}/members/{user_id}/admin
-  /^meetings\/\d+$/,                // meetings/{id}
   /^meetings\/\d+\/status$/,        // meetings/{id}/status
   /^meetings\/\d+\/speakers$/,      // meetings/{id}/speakers
   /^meetings\/\d+\/transcribe$/,    // meetings/{id}/transcribe
@@ -78,7 +77,12 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // JSON 처리 (기존 로직)
-    const body = await request.json();
+    let body = null;
+    try {
+      body = await request.json();
+    } catch {
+      // body가 없는 POST 요청 (예: confluence/upload)
+    }
 
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
@@ -91,7 +95,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const response = await fetch(fullUrl, {
       method: 'POST',
       headers,
-      body: JSON.stringify(body),
+      body: body ? JSON.stringify(body) : undefined,
     });
 
     const data = await response.json();

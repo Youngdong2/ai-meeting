@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { TeamSetting, TeamSettingUpdateRequest } from '@/app/types/api';
 import { teamApi } from '@/app/lib/api';
+import HelpTooltip from '@/app/components/common/HelpTooltip';
 
 interface TeamSettingsProps {
   teamId: number;
@@ -172,6 +173,16 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div>
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 Site URL
+                <HelpTooltip
+                  content={
+                    <span>
+                      Atlassian Confluence 사이트 주소입니다.
+                      <br />
+                      <br />
+                      예: <code className="bg-[var(--bg-secondary)] px-1 rounded">https://yourcompany.atlassian.net</code>
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="url"
@@ -184,6 +195,15 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div>
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 User Email
+                <HelpTooltip
+                  content={
+                    <span>
+                      Atlassian 계정 이메일입니다.
+                      <br />
+                      API Token을 발급받은 계정의 이메일을 입력하세요.
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="email"
@@ -196,6 +216,24 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div>
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 API Token
+                <HelpTooltip
+                  content={
+                    <span>
+                      Atlassian API 토큰입니다.
+                      <br />
+                      <br />
+                      <a
+                        href="https://id.atlassian.com/manage-profile/security/api-tokens"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--link)] underline"
+                      >
+                        여기서 발급
+                      </a>
+                      받을 수 있습니다.
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="password"
@@ -208,6 +246,16 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div>
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 Space Key
+                <HelpTooltip
+                  content={
+                    <span>
+                      회의록이 업로드될 Confluence 스페이스 키입니다.
+                      <br />
+                      <br />
+                      URL에서 확인: <code className="bg-[var(--bg-secondary)] px-1 rounded">/wiki/spaces/<strong>KEY</strong>/...</code>
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="text"
@@ -220,6 +268,19 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div className="col-span-2">
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 Parent Page ID (선택)
+                <HelpTooltip
+                  content={
+                    <span>
+                      회의록이 생성될 상위 페이지 ID입니다.
+                      <br />
+                      <br />
+                      페이지 URL에서 확인: <code className="bg-[var(--bg-secondary)] px-1 rounded">/pages/<strong>123456</strong>/...</code>
+                      <br />
+                      <br />
+                      비워두면 스페이스 최상위에 생성됩니다.
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="text"
@@ -255,6 +316,16 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div>
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 Webhook URL
+                <HelpTooltip
+                  content={
+                    <span>
+                      Slack Incoming Webhook URL입니다.
+                      <br />
+                      <br />
+                      Slack 앱 설정 → Incoming Webhooks에서 생성할 수 있습니다.
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="password"
@@ -271,6 +342,18 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div>
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 Bot Token (선택)
+                <HelpTooltip
+                  content={
+                    <span>
+                      Slack Bot User OAuth Token입니다.
+                      <br />
+                      <br />
+                      Webhook URL만으로도 메시지 전송이 가능합니다.
+                      <br />
+                      Bot Token은 추가 기능이 필요할 때 사용합니다.
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="password"
@@ -283,6 +366,16 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
             <div>
               <label className="block text-caption text-[var(--text-secondary)] mb-2">
                 기본 채널
+                <HelpTooltip
+                  content={
+                    <span>
+                      회의록이 공유될 기본 Slack 채널입니다.
+                      <br />
+                      <br />
+                      예: <code className="bg-[var(--bg-secondary)] px-1 rounded">#meeting-notes</code>
+                    </span>
+                  }
+                />
               </label>
               <input
                 type="text"
