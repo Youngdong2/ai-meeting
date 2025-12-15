@@ -20,6 +20,7 @@ const NO_TRAILING_SLASH_PATTERNS = [
   /^teams\/\d+\/settings\/update$/, // teams/{id}/settings/update
   /^teams\/\d+\/members$/,          // teams/{id}/members
   /^teams\/\d+\/members\/\d+\/admin$/, // teams/{id}/members/{user_id}/admin
+  /^meetings\/\d+$/,                // meetings/{id} - GET/PATCH only
   /^meetings\/\d+\/status$/,        // meetings/{id}/status
   /^meetings\/\d+\/speakers$/,      // meetings/{id}/speakers
   /^meetings\/\d+\/transcribe$/,    // meetings/{id}/transcribe
@@ -214,11 +215,14 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const { path } = await params;
-  const apiPath = buildApiPath(path);
+  // DELETE 요청도 trailing slash 없이 (백엔드 확인 결과)
+  const apiPath = path.join('/');
+  const fullUrl = `${API_BASE_URL}/${apiPath}`;
+
+  const authHeader = request.headers.get('Authorization');
+  console.log('[PROXY DELETE]', fullUrl, 'Auth:', authHeader ? 'Bearer ***' : 'NONE');
 
   try {
-    const authHeader = request.headers.get('Authorization');
-
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -227,12 +231,24 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       headers['Authorization'] = authHeader;
     }
 
-    const response = await fetch(`${API_BASE_URL}/${apiPath}`, {
+    const response = await fetch(fullUrl, {
       method: 'DELETE',
       headers,
     });
 
-    const data = await response.json();
+    console.log('[PROXY DELETE Response]', response.status);
+
+    // 204 No Content 또는 빈 응답 처리
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+      return NextResponse.json({ success: true, data: null }, { status: 200 });
+    }
+
+    const text = await response.text();
+    if (!text) {
+      return NextResponse.json({ success: true, data: null }, { status: 200 });
+    }
+
+    const data = JSON.parse(text);
     return NextResponse.json(data, { status: response.status });
   } catch {
     return NextResponse.json(
