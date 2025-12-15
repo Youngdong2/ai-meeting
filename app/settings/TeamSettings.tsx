@@ -36,6 +36,7 @@ export default function TeamSettings({ teamId }: TeamSettingsProps) {
         setSettings(response.data);
         setConfluenceSiteUrl(response.data.confluence_site_url || '');
         setConfluenceSpaceKey(response.data.confluence_space_key || '');
+        setConfluenceParentPageId(response.data.confluence_parent_page_id || '');
         setSlackDefaultChannel(response.data.slack_default_channel || '');
       } else {
         setError(response.error?.message || '설정을 불러오는데 실패했습니다.');

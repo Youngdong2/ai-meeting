@@ -476,8 +476,8 @@ export const meetingApi = {
   },
 
   // Confluence 업로드
-  uploadToConfluence: async (meetingId: number): Promise<ApiResponse<{ message: string }>> => {
-    return fetchApi<{ message: string }>(
+  uploadToConfluence: async (meetingId: number): Promise<ApiResponse<{ message: string; confluence_page_url?: string }>> => {
+    return fetchApi<{ message: string; confluence_page_url?: string }>(
       `/meetings/${meetingId}/confluence/upload`,
       { method: 'POST' },
       true

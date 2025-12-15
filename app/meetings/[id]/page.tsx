@@ -41,16 +41,29 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
   }, [fetchMeeting, id]);
 
   // Confluence 업로드
+  const [confluenceUrl, setConfluenceUrl] = useState<string | null>(null);
+
   const handleConfluenceUpload = async () => {
     setIsUploadingConfluence(true);
     setServiceError(null);
     setServiceSuccess(null);
+    setConfluenceUrl(null);
 
     const response = await meetingApi.uploadToConfluence(parseInt(id, 10));
 
     if (response.success) {
-      setServiceSuccess('Confluence에 업로드되었습니다');
+      const url = response.data?.confluence_page_url;
+      if (url) {
+        setConfluenceUrl(url);
+        setServiceSuccess('Confluence에 업로드되었습니다');
+      } else {
+        setServiceSuccess('Confluence에 업로드되었습니다');
+      }
+      // 비동기 업로드 시작됨 - 2초 후 다시 조회하여 URL 확인
       fetchMeeting(parseInt(id, 10));
+      setTimeout(() => {
+        fetchMeeting(parseInt(id, 10));
+      }, 2000);
     } else {
       setServiceError(response.error?.message || 'Confluence 업로드에 실패했습니다');
     }
@@ -104,6 +117,28 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}분 ${secs}초`;
+  };
+
+  // 화자별 색상 배열
+  const speakerColors = [
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-purple-500',
+    'bg-orange-500',
+    'bg-pink-500',
+    'bg-teal-500',
+    'bg-indigo-500',
+    'bg-red-500',
+    'bg-yellow-500',
+    'bg-cyan-500',
+  ];
+
+  // 화자별 색상 매핑 생성
+  const getSpeakerColor = (speaker: string) => {
+    if (!currentMeeting?.chat_transcript) return speakerColors[0];
+    const speakers = [...new Set(currentMeeting.chat_transcript.map(item => item.speaker))];
+    const index = speakers.indexOf(speaker);
+    return speakerColors[index % speakerColors.length];
   };
 
   // 최초 로딩 시에만 스켈레톤 표시 (이미 데이터가 있으면 스켈레톤 표시 안함)
@@ -248,7 +283,22 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
           )}
           {serviceSuccess && (
             <div className="px-4 py-3 bg-green-50 border border-green-200 rounded-lg">
-              <p className="text-[14px] text-green-600">{serviceSuccess}</p>
+              <p className="text-[14px] text-green-600">
+                {serviceSuccess}
+                {confluenceUrl && (
+                  <>
+                    {' - '}
+                    <a
+                      href={confluenceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline font-medium"
+                    >
+                      페이지 보기
+                    </a>
+                  </>
+                )}
+              </p>
             </div>
           )}
 
@@ -372,7 +422,7 @@ export default function MeetingDetailPage({ params }: MeetingDetailPageProps) {
               {currentMeeting.chat_transcript.map((item, index) => (
                 <div key={index} className="p-4 flex gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-[var(--link)] text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    <div className={`w-10 h-10 ${getSpeakerColor(item.speaker)} text-white rounded-full flex items-center justify-center text-sm font-medium`}>
                       {item.speaker.charAt(0).toUpperCase()}
                     </div>
                   </div>
